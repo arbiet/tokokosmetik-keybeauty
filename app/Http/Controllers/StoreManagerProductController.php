@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 class StoreManagerProductController extends Controller
 {
@@ -63,10 +64,18 @@ class StoreManagerProductController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // maksimum 2MB
             'category_id' => 'required|exists:categories,id', // tambahkan validasi untuk category_id
         ]);
+        
 
         // Simpan gambar produk
         $imagePath = $request->file('image')->store('public/images/products');
-
+        $slug = Str::slug($request->input('name'));
+        // Gunakan while loop untuk memastikan slug yang unik
+        $originalSlug = $slug;
+        $count = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
         // Buat produk baru berdasarkan data yang dikirimkan oleh form
         $product = new Product([
             'name' => $request->input('name'),
@@ -75,6 +84,7 @@ class StoreManagerProductController extends Controller
             'stock' => $request->input('stock'),
             'image' => basename($imagePath), // simpan nama file gambar saja
             'category_id' => $request->input('category_id'), // tambahkan category_id
+            'slug' => $slug,
         ]);
 
         // Simpan produk ke dalam database
@@ -119,6 +129,9 @@ class StoreManagerProductController extends Controller
         $product->price = $request->input('price');
         $product->stock = $request->input('stock');
         $product->category_id = $request->input('category_id'); // tambahkan category_id
+        $slug = Str::slug($request->input('name'));
+        $product->slug = $slug;
+
     
         // Periksa apakah ada file gambar yang diunggah
         if ($request->hasFile('image')) {

@@ -9,22 +9,15 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'description',
+    ];
 
     // Relasi One-to-Many dengan Product
     public function products()
     {
         return $this->hasMany(Product::class);
-    }
-
-    // Method untuk menghapus produk terkait saat kategori dihapus
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function($category) {
-            $category->products()->delete();
-        });
     }
 }
 

@@ -34,7 +34,7 @@
                         <ol role="list" class="flex items-center space-x-2">
                             <li>
                                 <div class="flex items-center">
-                                    <a href="#" class="mr-2 text-sm font-medium text-gray-900">{{ $product->category }}</a>
+                                    <a href="#" class="mr-2 text-sm font-medium text-gray-900">{{ $product->category->name }}</a>
                                     <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor" aria-hidden="true" class="h-5 w-4 text-gray-300">
                                         <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
                                     </svg>
@@ -60,7 +60,7 @@
                                 <!-- Product Details -->
                                 <div class="mt-4">
                                     <!-- Category, Price, Stock -->
-                                    <p class="text-sm text-gray-600">Category: {{ $product->category }}</p>
+                                    <p class="text-sm text-gray-600">Category: {{ $product->category->name }}</p>
                                     <p class="text-sm text-gray-600">Price: ${{ $product->price }}</p>
                                     <p class="text-sm text-gray-600">Stock: {{ $product->stock }}</p>
                                 </div>
