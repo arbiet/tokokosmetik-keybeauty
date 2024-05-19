@@ -6,11 +6,16 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StoreManagerController;
 use App\Http\Controllers\StoreManagerProductController;
 use App\Http\Controllers\StoreManagerCategoryController;
-use App\Http\Controllers\CostumerController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\CustomerCartController;
+use App\Http\Controllers\CustomerPaymentController;
+use App\Http\Controllers\CustomerHistoryController;
+use App\Http\Controllers\CustomerPromoController;
+use App\Http\Controllers\WelcomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+Route::get('/product/{product:slug}', [WelcomeController::class, 'show'])->name('welcome.product.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -25,6 +30,20 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+
+        // Cek peran pengguna dan arahkan ke dashboard yang sesuai
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard.index');
+        } elseif ($user->isStoreManager()) {
+            return redirect()->route('storemanager.dashboard.index');
+        } elseif ($user->isCustomer()) {
+            return redirect()->route('customer.dashboard.index');
+        } else {
+            return view('dashboard');
+        }
+    })->name('dashboard');
 
     Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(function () {
         Route::get('/dashboard',[AdminController::class,'index'])->name('admin.dashboard.index');
@@ -54,10 +73,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     
     Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->group(function () {
-        Route::get('/dashboard',[AdminController::class,'index'])->name('customer.dashboard.index');
-        Route::get('/products',[AdminController::class,'index'])->name('customer.products.index');
-        Route::get('/carts',[AdminController::class,'index'])->name('customer.carts.index');
-        Route::get('/payments',[AdminController::class,'index'])->name('customer.payments.index');
-        Route::get('/history',[AdminController::class,'index'])->name('customer.history.index');
+        Route::get('/dashboard',[CustomerController::class,'index'])->name('customer.dashboard.index');
+        Route::get('/products',[CustomerProductController::class,'index'])->name('customer.products.index');
+        Route::get('/carts', [CustomerCartController::class, 'index'])->name('customer.carts.index');
+        Route::post('/cart/add/{product}', [CustomerCartController::class, 'addToCart'])->name('customer.carts.add'); // Ubah nama rute dan URI
+        Route::delete('/carts/{cart}', [CustomerCartController::class, 'destroy'])->name('customer.carts.destroy');
+        Route::patch('/cart/update/{cart}', [CustomerCartController::class, 'updateQuantity'])->name('customer.carts.update');
+        Route::delete('/cart/destroy/{cart}', [CustomerCartController::class, 'destroy'])->name('customer.carts.destroy');
+        Route::post('/cart/checkout', [CustomerCartController::class, 'checkout'])->name('customer.carts.checkout');
+        Route::get('/cart/checkout/invoice', [CustomerCartController::class, 'invoice'])->name('customer.carts.invoice');
+        Route::post('/promo/check', [CustomerPromoController::class, 'checkPromo'])->name('customer.promo.check');
+        Route::get('/payments',[CustomerPaymentController::class,'index'])->name('customer.payments.index');
+        Route::get('/history',[CustomerHistoryController::class,'index'])->name('customer.history.index');
     });
+    
 });
