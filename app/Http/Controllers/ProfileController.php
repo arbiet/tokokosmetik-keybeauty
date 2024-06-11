@@ -1,5 +1,7 @@
 <?php
 
+// app\Http\Controllers\ProfileController.php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
@@ -56,5 +58,33 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function editAddress(Request $request): View
+    {
+        $address = $request->user()->addresses()->first();
+
+        return view('profile.address', compact('address'));
+    }
+
+    public function updateAddress(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:255',
+        ]);
+
+        $user = Auth::user();
+
+        // Use updateOrCreate with the necessary data fields
+        $user->addresses()->updateOrCreate(
+            ['user_id' => $user->id],
+            $request->only('street', 'city', 'state', 'country', 'postal_code')
+        );
+
+        return back()->with('status', 'address-updated');
     }
 }

@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StoreManagerController;
 use App\Http\Controllers\StoreManagerProductController;
 use App\Http\Controllers\StoreManagerCategoryController;
+use App\Http\Controllers\StoreManagerPromoController;
+use App\Http\Controllers\StoreManagerOrderController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\CustomerCartController;
@@ -45,6 +47,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('dashboard');
 
+    Route::get('/profile/address', [ProfileController::class, 'editAddress'])->name('profile.address');
+    Route::patch('/profile/address', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
+
     Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(function () {
         Route::get('/dashboard',[AdminController::class,'index'])->name('admin.dashboard.index');
         Route::get('/user',[AdminController::class,'index'])->name('admin.users.index');
@@ -69,6 +74,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/categories/{category}', [StoreManagerCategoryController::class, 'update'])->name('storemanager.categories.update');
         Route::delete('/categories/{category}', [StoreManagerCategoryController::class, 'destroy'])->name('storemanager.categories.destroy');
         Route::get('/orders', [AdminController::class, 'index'])->name('storemanager.orders.index');
+
+        Route::get('/promos', [StoreManagerPromoController::class, 'index'])->name('storemanager.promos.index');
+        Route::get('/promos/create', [StoreManagerPromoController::class, 'create'])->name('storemanager.promos.create');
+        Route::post('/promos', [StoreManagerPromoController::class, 'store'])->name('storemanager.promos.store');
+        Route::get('/promos/{promo}/edit', [StoreManagerPromoController::class, 'edit'])->name('storemanager.promos.edit');
+        Route::put('/promos/{promo}', [StoreManagerPromoController::class, 'update'])->name('storemanager.promos.update');
+        Route::delete('/promos/{promo}', [StoreManagerPromoController::class, 'destroy'])->name('storemanager.promos.destroy');
+
+        Route::get('/orders', [StoreManagerOrderController::class, 'index'])->name('storemanager.orders.index');
+        Route::get('/orders/{order}', [StoreManagerOrderController::class, 'show'])->name('storemanager.orders.show');
+        Route::get('/orders/{order}/verifyPayment', [StoreManagerOrderController::class, 'verifyPayment'])->name('storemanager.orders.verifyPayment');
+        Route::get('/orders/{order}/cancel', [StoreManagerOrderController::class, 'cancelOrder'])->name('storemanager.orders.cancel');
+        Route::post('/orders/{order}/addTrackingNumber', [StoreManagerOrderController::class, 'addTrackingNumber'])->name('storemanager.orders.addTrackingNumber');
+        Route::get('/orders/{order}/complete', [StoreManagerOrderController::class, 'completeOrder'])->name('storemanager.orders.complete');
     });
     
     

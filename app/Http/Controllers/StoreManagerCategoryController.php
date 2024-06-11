@@ -29,9 +29,9 @@ class StoreManagerCategoryController extends Controller
         $categories->withCount('products');
 
         $categories = $categories->paginate(8);
-        return view('storemanager.categories.index', compact('categories'));
-    }
 
+        return view('storemanager.categories.index', compact('categories'))->with('search', $search);
+    }
 
     /**
      * Menampilkan formulir untuk membuat kategori baru.

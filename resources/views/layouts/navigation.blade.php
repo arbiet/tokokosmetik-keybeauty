@@ -69,6 +69,11 @@
                                 {{ __('Orders') }}
                             </x-nav-link>
                         </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('storemanager.promos.index')" :active="request()->routeIs('storemanager.promos*')">
+                                {{ __('Promos') }}
+                            </x-nav-link>
+                        </div>
                     @else
                     @endif
                 @endauth
@@ -93,6 +98,9 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.address')">
+                            {{ __('Address') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -168,6 +176,9 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.address')">
+                    {{ __('Address') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
