@@ -104,7 +104,19 @@
                         </a>
                     </div>
                     
-                    
+                    @if ($order->status === 'shipped')
+                        <div class="mt-6 text-center">
+                            <button onclick="confirmComplete({{ $order->id }})" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                <i class="fas fa-check"></i> Mark as Completed
+                            </button>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <a href="https://wa.me/081216318022?text=I%20have%20an%20issue%20with%20Order%20%23{{ $order->id }}" target="_blank" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                                <i class="fas fa-exclamation-triangle"></i> Report Issue via WhatsApp
+                            </a>
+                        </div>
+                    @endif
+
                     @if ($order->status === 'unpaid' || $order->status === 'canceled')
                         <div class="mt-6">
                             <h4 class="font-semibold text-lg text-gray-900">
@@ -184,10 +196,12 @@
                                 <i class="fas fa-check text-2xl @if($order->status === 'completed') text-green-500 @else text-gray-500 @endif"></i>
                                 <p>Completed</p>
                             </div>
+                            @if($order->status === 'canceled')
                             <div class="text-center">
                                 <i class="fas fa-times-circle text-2xl @if($order->status === 'canceled') text-red-500 @else text-gray-500 @endif"></i>
                                 <p>Canceled</p>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -204,5 +218,27 @@
                 focusConfirm: false,
             });
         }
+        function confirmComplete(orderId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to mark this order as completed?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, complete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form to complete the order
+                    document.getElementById('complete-order-form-' + orderId).submit();
+                }
+            });
+        }
     </script>
+
+    @if ($order->status === 'shipped')
+        <form id="complete-order-form-{{ $order->id }}" method="POST" action="{{ route('customer.orders.complete', $order->id) }}" style="display: none;">
+            @csrf
+        </form>
+    @endif
 </x-app-layout>

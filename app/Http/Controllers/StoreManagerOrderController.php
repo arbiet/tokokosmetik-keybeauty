@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StoreManagerOrderController extends Controller
 {
@@ -47,13 +48,25 @@ class StoreManagerOrderController extends Controller
         $request->validate([
             'tracking_number' => 'required|string|max:255',
         ]);
-
-        $order->tracking_number = $request->input('tracking_number');
-        $order->status = 'shipped';
-        $order->save();
-        Alert::success('Tracking Number Added', 'Order status has been updated to shipped.');
-
-        return redirect()->route('storemanager.orders.show', $order);
+    
+        try {
+            $order->tracking_number = $request->input('tracking_number');
+            $order->status = 'shipped';
+            $order->save();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Tracking number added and order status updated to shipped.'
+            ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to add tracking number: ' . $e->getMessage());
+    
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add tracking number.'
+            ], 500);
+        }
     }
 
     public function completeOrder(Order $order)
@@ -64,4 +77,21 @@ class StoreManagerOrderController extends Controller
 
         return redirect()->route('storemanager.orders.show', $order);
     }
+
+    public function changeStatus(Request $request, Order $order)
+    {
+        $status = $request->input('status');
+        $order->status = $status;
+        $order->save();
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function generateInvoice($id)
+    {
+        $order = Order::with('items.product')->findOrFail($id);
+        $pdf = Pdf::loadView('storemanager.orders.invoice', compact('order'));
+        return $pdf->download('invoice-order-'.$order->id.'.pdf');
+    }
+
 }

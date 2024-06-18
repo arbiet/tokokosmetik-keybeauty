@@ -17,7 +17,7 @@
                         <div id="shipping-options" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach ($shippingOptions as $shippingOption)
                                 @foreach ($shippingOption['costs'] as $cost)
-                                    <div class="flex items-center justify-between py-2 px-4 border border-gray-300 rounded-md mb-2 shipping-option" onclick="selectShippingOption(this, {{ $cost['cost'][0]['value'] }})">
+                                    <div class="flex items-center justify-between py-2 px-4 border border-gray-300 rounded-md mb-2 shipping-option" onclick="selectShippingOption(this, {{ $cost['cost'][0]['value'] }}, '{{ $shippingOption['name'] }} - {{ $cost['service'] }}')">
                                         <div>
                                             <p class="text-gray-900 font-semibold">{{ $shippingOption['name'] }} - {{ $cost['service'] }}</p>
                                             <p class="text-gray-500 text-sm">{{ $cost['description'] }}</p>
@@ -131,7 +131,7 @@
     let selectedShippingOption = null;
     let selectedPromoOption = null;
 
-    function selectShippingOption(element, cost) {
+    function selectShippingOption(element, cost, service) {
         if (selectedShippingOption) {
             selectedShippingOption.classList.remove('bg-blue-100', 'border-blue-500');
         }
@@ -141,6 +141,7 @@
         document.getElementById('shipping-cost').innerText = 'Rp. ' + new Intl.NumberFormat('id-ID').format(cost);
         document.getElementById('shipping-details-row').style.display = 'table-row';
         document.getElementById('hidden-shipping-cost').value = cost;
+        document.getElementById('hidden-shipping-service').value = service;
 
         updateFinalTotal();
     }

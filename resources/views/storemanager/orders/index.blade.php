@@ -16,7 +16,10 @@
                                     <th class="p-2">Order ID</th>
                                     <th class="p-2">Customer</th>
                                     <th class="p-2">Total Amount</th>
+                                    <th class="p-2">Order Date</th>
                                     <th class="p-2">Status</th>
+                                    <th class="p-2">Tracking Number</th>
+                                    <th class="p-2">Shipping Service</th>
                                     <th class="p-2">Actions</th>
                                 </tr>
                             </thead>
@@ -29,18 +32,39 @@
                                                 {{ $order->user->name }}
                                             </a>
                                         </td>
-                                        <td class="p-2">{{ $order->total_amount }}</td>
-                                        <td class="p-2">{{ $order->status }}</td>
+                                        <td class="p-2">Rp. {{ number_format($order->final_total, 2) }}</td>
+                                        <td class="p-2">{{ $order->order_date }}</td>
+                                        <td class="p-2">{{ ucfirst($order->status) }}</td>
+                                        <td class="p-2">{{ $order->tracking_number ?? 'N/A' }}</td>
+                                        <td class="p-2">{{ $order->shipping_service ?? 'N/A' }}</td>
                                         <td class="p-2 space-x-2 flex">
-                                            @if($order->status == 'unpaid' && $order->payment_proof)
-                                                <button onclick="verifyPayment({{ $order->id }})" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Verify Payment</button>
-                                                <button onclick="cancelOrder({{ $order->id }})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Cancel Order</button>
+                                            @if($order->status == 'paid')
+                                                <button onclick="checkPaymentProof({{ $order->id }}, '{{ asset('storage/' . $order->payment_proof) }}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                                    <i class="fas fa-file-invoice-dollar"></i>
+                                                </button>
+                                                <button onclick="changeStatus({{ $order->id }}, 'cancelled')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                <button onclick="changeStatus({{ $order->id }}, 'packaging')" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
                                             @elseif($order->status == 'packaging')
-                                                <button onclick="addTrackingNumber({{ $order->id }})" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Add Tracking Number</button>
+                                                <button onclick="addTrackingNumber({{ $order->id }})" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                                    <i class="fas fa-truck"></i>
+                                                </button>
                                             @elseif($order->status == 'shipped')
-                                                <button onclick="completeOrder({{ $order->id }})" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Mark as Completed</button>
+                                                <button onclick="completeOrder({{ $order->id }})" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                                @if($order->tracking_number && in_array($order->shipping_service, ['jne', 'pos', 'tiki']))
+                                                    <button onclick="trackPackage('{{ $order->tracking_number }}', '{{ $order->shipping_service }}')" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                @endif
                                             @endif
-                                            <a href="{{ route('storemanager.orders.show', $order) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">View</a>
+                                            <a href="{{ route('storemanager.orders.show', $order) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -56,34 +80,72 @@
     </div>
 
     <script>
-        function verifyPayment(orderId) {
+        function checkPaymentProof(orderId, paymentProofUrl) {
             Swal.fire({
-                title: 'Verify Payment',
-                text: 'Are you sure you want to verify this payment?',
-                icon: 'question',
+                title: 'Payment Proof',
+                imageUrl: paymentProofUrl,
+                imageAlt: 'Payment Proof',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, verify it!'
+                confirmButtonText: 'Accept Payment',
+                cancelButtonText: 'Cancel Order',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ status: 'packaging' })
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json()
+                    }).catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`)
+                    })
+                },
+                allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `/storemanager/orders/${orderId}/verifyPayment`;
+                    Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
+                        location.reload();
+                    });
                 }
             });
         }
 
-        function cancelOrder(orderId) {
+        function changeStatus(orderId, status) {
             Swal.fire({
-                title: 'Cancel Order',
-                text: 'Are you sure you want to cancel this order?',
-                icon: 'warning',
+                title: status === 'cancelled' ? 'Cancel Order' : 'Accept Order',
+                text: `Are you sure you want to ${status === 'cancelled' ? 'cancel' : 'accept'} this order?`,
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!'
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `Yes, ${status === 'cancelled' ? 'cancel' : 'accept'} it!`
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = window.location.href = `/storemanager/orders/${orderId}/cancel`;
+                    fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ status })
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json()
+                    }).then(() => {
+                        Swal.fire('Success', `Order has been ${status === 'cancelled' ? 'cancelled' : 'accepted'}.`, 'success').then(() => {
+                            location.reload();
+                        });
+                    }).catch(error => {
+                        Swal.fire('Error', `Failed to ${status === 'cancelled' ? 'cancel' : 'accept'} order.`, 'error');
+                    });
                 }
             });
         }
@@ -108,7 +170,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(response.statusText)
+                            return response.json().then(error => { throw new Error(error.message) })
                         }
                         return response.json()
                     })
@@ -141,10 +203,46 @@
                 confirmButtonText: 'Yes, complete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `/storemanager/orders/${orderId}/complete`;
+                    fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ status: 'completed' })
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json()
+                    }).then(() => {
+                        Swal.fire('Success', 'Order has been marked as completed.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }).catch(error => {
+                        Swal.fire('Error', 'Failed to mark order as completed.', 'error');
+                    });
                 }
             });
         }
+        function trackPackage(trackingNumber, shippingService) {
+        let url = '';
+        
+        switch (shippingService) {
+            case 'jne':
+                url = `https://jne.co.id/tracking-package?cek-resi=${trackingNumber}`;
+                break;
+            case 'pos':
+                url = `https://www.posindonesia.co.id/id/tracking?receiptId=${trackingNumber}`;
+                break;
+            case 'tiki':
+                url = `https://tiki.id/id/track?tracking=${trackingNumber}`;
+                break;
+            default:
+                return;
+        }
+
+        window.open(url, '_blank');
+    }
     </script>
 </x-app-layout>
-

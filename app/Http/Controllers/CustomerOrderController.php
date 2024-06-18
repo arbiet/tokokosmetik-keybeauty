@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Cart;
+use App\Models\OrderItem;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CustomerOrderController extends Controller
 {
@@ -119,6 +123,17 @@ class CustomerOrderController extends Controller
     {
         $order = Order::with('items.product')->findOrFail($id);
         $pdf = Pdf::loadView('customer.orders.invoice', compact('order'));
-        return $pdf->download('invoice-order-'.$order->id.'.pdf');
+        return $pdf->download('invoice-order-' . $order->id . '.pdf');
+    }
+    public function complete($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status === 'shipped') {
+            $order->update(['status' => 'completed']);
+            return redirect()->route('customer.orders.show', $order->id)->with('success', 'Order marked as completed.');
+        }
+
+        return redirect()->back()->withErrors('Unable to mark order as completed.');
     }
 }

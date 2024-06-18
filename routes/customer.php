@@ -10,7 +10,7 @@ use App\Http\Controllers\CustomerOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->group(function () {
-    Route::get('/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard.index');
+    Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('customer.dashboard.index');
     Route::get('/products', [CustomerProductController::class, 'index'])->name('customer.products.index');
     Route::get('/carts', [CustomerCartController::class, 'index'])->name('customer.carts.index');
     Route::post('/cart/add/{product}', [CustomerCartController::class, 'addToCart'])->name('customer.carts.add'); 
@@ -27,4 +27,5 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->group(f
     Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
     Route::post('/orders/{order}/upload-payment-proof', [CustomerOrderController::class, 'uploadPaymentProof'])->name('customer.orders.uploadPaymentProof');
     Route::get('customer/orders/{order}/invoice', [CustomerOrderController::class, 'generateInvoice'])->name('customer.orders.invoice');
+    Route::post('/customer/orders/{order}/complete', [CustomerOrderController::class, 'complete'])->name('customer.orders.complete');
 });
