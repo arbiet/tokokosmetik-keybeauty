@@ -48,8 +48,11 @@
                     <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
                         <div class="p-4">
                             <h3 class="font-semibold text-lg mb-2">{{ $promo->promo_code }}</h3>
-                            <p class="text-gray-600">Discount: {{ $promo->discount_amount }}</p>
-                            <p class="text-gray-600">Minimum Purchase: {{ $promo->minimum_purchase }}</p>
+                            <p class="text-gray-600">Discount: {{ $promo->discount_percentage }}%</p>
+                            <p class="text-gray-600">Max Discount: Rp. {{ number_format($promo->maximum_discount, 0, ',', '.') }}</p>
+                            <p class="text-gray-600">Minimum Purchase: Rp. {{ number_format($promo->minimum_purchase, 0, ',', '.') }}</p>
+                            <p class="text-gray-600">Start Date: {{ $promo->start_date->format('d M Y') }}</p>
+                            <p class="text-gray-600">End Date: {{ $promo->end_date->format('d M Y') }}</p>
                             <div class="flex justify-between mt-4">
                                 <a href="{{ route('storemanager.promos.edit', ['promo' => $promo]) }}" class="text-blue-500 hover:text-blue-700">Edit</a>
                                 <button onclick="confirmDeletePromo('{{ $promo->id }}')" class="text-red-500 hover:text-red-700">Delete</button>

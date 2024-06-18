@@ -16,9 +16,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
+            RajaongkirProvincesSeeder::class,
+            RajaongkirCitiesSeeder::class,
+            PromoSeeder::class,
             CartSeeder::class,
             OrderSeeder::class,
-            PromoSeeder::class,
         ]);
     }
 }

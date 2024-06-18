@@ -32,9 +32,14 @@ class ProductSeeder extends Seeder
                     'slug' => 'produk-' . $j . '-kategori-' . $categoryId,
                     'description' => 'Deskripsi Produk ' . $j . ' Kategori ' . $categoryId,
                     'category_id' => $categoryId,
-                    'price' => rand(50, 200), // Harga produk random antara 50 dan 200
+                    'price' => rand(10000, 200000), // Harga produk random antara 50 dan 200
                     'stock' => rand(10, 100), // Stok produk random antara 10 dan 100
                     'image' => 'default.png',
+                    'weight' => rand(300, 1000), // Berat produk random antara 1 dan 10
+                    'length' => rand(10, 100), // Panjang produk random antara 10 dan 100
+                    'width' => rand(10, 100), // Lebar produk random antara 10 dan 100
+                    'height' => rand(10, 100), // Tinggi produk random antara 10 dan 100
+                    'status' => 'available', // Status produk default 'available'
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

@@ -31,12 +31,22 @@
                             @enderror
                         </div>
 
-                        <!-- Discount Amount -->
+                        <!-- Discount Percentage -->
                         <div class="mt-4">
-                            <label for="discount_amount" class="block text-sm font-medium leading-5 text-gray-700">Discount Amount</label>
-                            <input id="discount_amount" type="number" step="0.01" name="discount_amount" value="{{ old('discount_amount', $promo->discount_amount) }}" required
-                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('discount_amount') border-red-500 @enderror">
-                            @error('discount_amount')
+                            <label for="discount_percentage" class="block text-sm font-medium leading-5 text-gray-700">Discount Percentage</label>
+                            <input id="discount_percentage" type="number" step="0.01" name="discount_percentage" value="{{ old('discount_percentage', $promo->discount_percentage) }}" required
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('discount_percentage') border-red-500 @enderror">
+                            @error('discount_percentage')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Maximum Discount -->
+                        <div class="mt-4">
+                            <label for="maximum_discount" class="block text-sm font-medium leading-5 text-gray-700">Maximum Discount</label>
+                            <input id="maximum_discount" type="number" step="0.01" name="maximum_discount" value="{{ old('maximum_discount', $promo->maximum_discount) }}" required
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('maximum_discount') border-red-500 @enderror">
+                            @error('maximum_discount')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
@@ -47,6 +57,26 @@
                             <input id="minimum_purchase" type="number" step="0.01" name="minimum_purchase" value="{{ old('minimum_purchase', $promo->minimum_purchase) }}" required
                                 class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('minimum_purchase') border-red-500 @enderror">
                             @error('minimum_purchase')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="mt-4">
+                            <label for="start_date" class="block text-sm font-medium leading-5 text-gray-700">Start Date</label>
+                            <input id="start_date" type="date" name="start_date" value="{{ old('start_date', $promo->start_date) }}" required
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('start_date') border-red-500 @enderror">
+                            @error('start_date')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="mt-4">
+                            <label for="end_date" class="block text-sm font-medium leading-5 text-gray-700">End Date</label>
+                            <input id="end_date" type="date" name="end_date" value="{{ old('end_date', $promo->end_date) }}" required
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('end_date') border-red-500 @enderror">
+                            @error('end_date')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>

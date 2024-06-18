@@ -25,13 +25,19 @@ class OrderSeeder extends Seeder
         foreach ($carts as $cart) {
             // Calculate total amount based on product price and quantity
             $totalAmount = $cart->product->price * $cart->quantity;
+            $totalWeight = $cart->product->weight * $cart->quantity / 1000;
 
             // Check if total amount is greater than 150
             if ($totalAmount > 150) {
                 // Apply discount based on promo code
                 $promoCode = rand(1, 10) > 5 ? 'CODE10' : 'CODE20'; // Randomly select promo code
                 $discount = $promoCode === 'CODE10' ? 0.1 : 0.2; // Set discount percentage
-                $totalAmount -= $totalAmount * $discount; // Calculate discounted total amount
+                $discountAmount = $totalAmount * $discount;
+                $totalAmount -= $discountAmount; // Calculate discounted total amount
+            } else {
+                $promoCode = null;
+                $discount = null;
+                $discountAmount = 0;
             }
 
             // Create order with random status
@@ -39,19 +45,23 @@ class OrderSeeder extends Seeder
             $order = Order::create([
                 'user_id' => $cart->user_id,
                 'status' => $status,
-                'total' => $totalAmount,
+                'total' => $totalAmount + $discountAmount, // Total before discount
                 'payment_proof' => null,
                 'shipping_service' => null,
                 'tracking_number' => null,
-                'order_date' => now(), // Tambahkan tanggal order
-                'payment_date' => null, // Tambahkan tanggal pembayaran
-                'packaging_date' => null, // Tambahkan tanggal packaging
-                'shipping_date' => null, // Tambahkan tanggal shipping
-                'completed_date' => null, // Tambahkan tanggal selesai
-                'canceled_date' => null, // Tambahkan tanggal cancel
-                'discount' => $totalAmount !== $cart->product->price * $cart->quantity ? $discount * 100 : null, // Tambahkan diskon jika ada
-                'final_total' => $totalAmount, // Tambahkan total akhir
-                'promo_code' => $totalAmount !== $cart->product->price * $cart->quantity ? $promoCode : null, // Tambahkan kode promo jika ada
+                'order_date' => now(),
+                'payment_date' => null,
+                'packaging_date' => null,
+                'shipping_date' => null,
+                'completed_date' => null,
+                'canceled_date' => null,
+                'discount' => $discount ? $discount * 100 : null, // Discount in percentage
+                'final_total' => $totalAmount, // Total after discount
+                'promo_code' => $promoCode,
+                'shipping_cost' => 10.00, // Example shipping cost, you can modify as needed
+                'total_weight' => $totalWeight,
+                'origin_location' => 'Toko Kosmetik Keybeauty, Nganjuk', // Example origin location
+                'destination_location' => $cart->user->addresses()->first() ? $cart->user->addresses()->first()->full_address : 'Unknown Address', // Example destination location
             ]);
 
             // Create order items from cart items
@@ -74,9 +84,9 @@ class OrderSeeder extends Seeder
                     break;
                 case 'shipped':
                     $order->shipping_service = 'shipping_service_name'; // Set shipping service name
-                    $order->tracking_number = 'tracking_number_value'; // Set tracking numb
+                    $order->tracking_number = 'tracking_number_value'; // Set tracking number
                     $order->payment_proof = 'payment.jpg'; // Set payment_proof file name
-                    $order->shipping_date = now(); // Set packaging date
+                    $order->shipping_date = now(); // Set shipping date
                     $order->packaging_date = now(); // Set packaging date
                     break;
                 case 'completed':
@@ -84,23 +94,23 @@ class OrderSeeder extends Seeder
                     $order->shipping_service = 'shipping_service_name'; // Set shipping service name
                     $order->tracking_number = 'tracking_number_value'; // Set tracking number
                     $order->payment_proof = 'payment.jpg'; // Set payment_proof file name
-                    $order->packaging_date = now(); // Set shipping date
-                    $order->shipping_date = now(); // Set packaging date
-                    $order->completed_date = now(); // Set packaging date
-
-                    // Remove cart items if the order is 'packaging', 'shipped', or 'completed'
-                    $cart->delete();
+                    $order->packaging_date = now(); // Set packaging date
+                    $order->shipping_date = now(); // Set shipping date
+                    $order->completed_date = now(); // Set completed date
                     break;
                 case 'canceled':
                     // If canceled, empty payment_proof, shipping_service, and tracking_number
-                    $order->canceled_date = now(); // Set cancel date
+                    $order->canceled_date = now(); // Set canceled date
                     break;
             }
 
             // Save changes to the order
             $order->save();
 
-            // You can update cart status or do any other actions here if needed
+            // Remove cart items if the order is 'packaging', 'shipped', or 'completed'
+            if (in_array($status, ['packaging', 'shipped', 'completed'])) {
+                $cart->delete();
+            }
         }
     }
 

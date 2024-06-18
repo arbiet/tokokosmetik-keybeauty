@@ -1,4 +1,5 @@
 <?php
+
 // app\Models\Address.php
 
 namespace App\Models;

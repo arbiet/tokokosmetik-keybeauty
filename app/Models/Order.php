@@ -12,14 +12,25 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'status',
-        'total_amount',
+        'total',
         'payment_proof',
         'tracking_number',
         'shipping_service',
-        // Add other relevant fields here
+        'order_date',
+        'payment_date',
+        'packaging_date',
+        'shipping_date',
+        'completed_date',
+        'canceled_date',
+        'discount',
+        'final_total',
+        'promo_code',
+        'shipping_cost',
+        'total_weight',
+        'origin_location',
+        'destination_location',
     ];
 
-    // Define the relationships
     public function user()
     {
         return $this->belongsTo(User::class);

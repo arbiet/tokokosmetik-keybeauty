@@ -5,9 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Promo;
 use App\Models\Cart;
+use Illuminate\Support\Facades\Log;
 
 class CustomerPromoController extends Controller
 {
+    public function fetchPromos(Request $request)
+    {
+        Log::info('fetchPromos method called');
+        try {
+            $subtotal = $request->input('subtotal', 0); // Default to 0 if not provided
+            Log::info('Subtotal: ' . $subtotal);
+            
+            // Check if subtotal is valid
+            if (!is_numeric($subtotal)) {
+                Log::error('Invalid subtotal: ' . $subtotal);
+                return response()->json(['error' => 'Invalid subtotal'], 400);
+            }
+
+            // Fetch promos from database
+            $promos = Promo::where('minimum_purchase', '<=', $subtotal)->get();
+            Log::info('Promos fetched: ' . $promos->count());
+
+            return response()->json($promos);
+        } catch (\Exception $e) {
+            // Log the exception message and stack trace for debugging
+            Log::error('Error fetching promos: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Failed to fetch promo options'], 500);
+        }
+    }
+
     public function checkPromo(Request $request)
     {
         $promoCode = $request->input('promo_code');

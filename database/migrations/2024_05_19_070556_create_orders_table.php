@@ -17,7 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id('id');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('total', 8, 2);
-            $table->enum('status', ['unpaid', 'packaging', 'shipped', 'completed', 'canceled'])->default('unpaid');
+            $table->enum('status', ['unpaid', 'paid', 'packaging', 'shipped', 'completed', 'canceled'])->default('unpaid');
             $table->string('payment_proof')->nullable();
             $table->string('shipping_service')->nullable();
             $table->string('tracking_number')->nullable();

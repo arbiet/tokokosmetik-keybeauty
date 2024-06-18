@@ -28,8 +28,11 @@ class StoreManagerPromoController extends Controller
     {
         $request->validate([
             'promo_code' => 'required|unique:promos|max:255',
-            'discount_amount' => 'required|numeric',
+            'discount_percentage' => 'required|numeric',
+            'maximum_discount' => 'required|numeric',
             'minimum_purchase' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         Promo::create($request->all());
@@ -46,8 +49,11 @@ class StoreManagerPromoController extends Controller
     {
         $request->validate([
             'promo_code' => 'required|max:255|unique:promos,promo_code,' . $promo->id,
-            'discount_amount' => 'required|numeric',
+            'discount_percentage' => 'required|numeric',
+            'maximum_discount' => 'required|numeric',
             'minimum_purchase' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         $promo->update($request->all());

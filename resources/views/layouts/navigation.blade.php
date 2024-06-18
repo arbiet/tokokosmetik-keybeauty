@@ -44,8 +44,8 @@
                             </x-nav-link>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <x-nav-link :href="route('customer.payments.index')" :active="request()->routeIs('customer.payments*')">
-                                {{ __('Payments') }}
+                            <x-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders*')">
+                                {{ __('Orders') }}
                             </x-nav-link>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -74,7 +74,6 @@
                                 {{ __('Promos') }}
                             </x-nav-link>
                         </div>
-                    @else
                     @endif
                 @endauth
             </div>
@@ -145,63 +144,86 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <div class="pt-2 pb-3 space-y-1">
-                @auth
-                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('admin.dashboard') || request()->routeIs('librarian.dashboard') || request()->routeIs('student.dashboard')">
-                        {{ __('Dashboard') }}
+            @auth
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('admin.dashboard') || request()->routeIs('librarian.dashboard') || request()->routeIs('student.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                @if(Auth::user()->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">
+                        {{ __('Users') }}
                     </x-responsive-nav-link>
-                    @if(Auth::user()->isAdmin())
-                        <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">
-                            {{ __('Users') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings*')">
-                            {{ __('Settings') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports*')">
-                            {{ __('Reports') }}
-                        </x-responsive-nav-link>
-                    @endif
-            
-                @endauth
-            </div>
+                    <x-responsive-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings*')">
+                        {{ __('Settings') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports*')">
+                        {{ __('Reports') }}
+                    </x-responsive-nav-link>
+                @elseif (Auth::user()->isCustomer())
+                    <x-responsive-nav-link :href="route('customer.products.index')" :active="request()->routeIs('customer.products*')">
+                        {{ __('Products') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('customer.carts.index')" :active="request()->routeIs('customer.carts*')">
+                        {{ __('Carts') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders*')">
+                        {{ __('Orders') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('customer.history.index')" :active="request()->routeIs('customer.history*')">
+                        {{ __('History') }}
+                    </x-responsive-nav-link>
+                @elseif (Auth::user()->isStoreManager())
+                    <x-responsive-nav-link :href="route('storemanager.products.index')" :active="request()->routeIs('storemanager.products*')">
+                        {{ __('Products') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('storemanager.categories.index')" :active="request()->routeIs('storemanager.categories*')">
+                        {{ __('Categories Products') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('storemanager.orders.index')" :active="request()->routeIs('storemanager.orders*')">
+                        {{ __('Orders') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('storemanager.promos.index')" :active="request()->routeIs('storemanager.promos*')">
+                        {{ __('Promos') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
-        @auth
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-base text-gray-500">{{ ucwords(Auth::user()->usertype) }}</div>
-            </div>
+            @auth
+                <div class="px-4">
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ ucwords(Auth::user()->usertype) }}</div>
+                </div>
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('profile.address')">
-                    {{ __('Address') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                <div class="mt-3 space-y-1">
+                    <x-responsive-nav-link :href="route('profile.edit')">
+                        {{ __('Profile') }}
                     </x-responsive-nav-link>
-                </form>
-            </div>
+                    <x-responsive-nav-link :href="route('profile.address')">
+                        {{ __('Address') }}
+                    </x-responsive-nav-link>
+
+                    <!-- Authentication -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <x-responsive-nav-link :href="route('logout')"
+                                onclick="event.preventDefault();
+                                            this.closest('form').submit();">
+                            {{ __('Log Out') }}
+                        </x-responsive-nav-link>
+                    </form>
+                </div>
             @endauth
             @guest
-            <div class="">
-                <x-responsive-nav-link :href="route('register')">
-                    {{ __('Register') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('login')">
-                    {{ __('Login') }}
-                </x-responsive-nav-link>
-            </div>
+                <div class="px-4">
+                    <x-responsive-nav-link :href="route('register')">
+                        {{ __('Register') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('login')">
+                        {{ __('Login') }}
+                    </x-responsive-nav-link>
+                </div>
             @endguest
         </div>
     </div>
