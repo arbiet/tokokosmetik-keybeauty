@@ -44,7 +44,7 @@
                                     <div class="p-4">
                                         <h3 class="font-semibold text-lg mb-2">{{ $product->name }}</h3>
                                         <p class="text-gray-600">{{ $product->description }}</p>
-                                        <p class="text-gray-600">Price: ${{ $product->price }}</p>
+                                        <p class="text-gray-600">Price: Rp. {{ number_format($product->price,2) }}</p>
                                         <p class="text-gray-600">Stock: {{ $product->stock }}</p>
                                         <p class="text-gray-600">Category: {{ $product->category->name }}</p>
                                         @auth
