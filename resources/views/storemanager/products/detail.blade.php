@@ -61,7 +61,7 @@
                                 <div class="mt-4">
                                     <!-- Category, Price, Stock -->
                                     <p class="text-sm text-gray-600">Category: {{ $product->category->name }}</p>
-                                    <p class="text-sm text-gray-600">Price: ${{ $product->price }}</p>
+                                    <p class="text-sm text-gray-600">Price: Rp. {{ number_format($product->price,2) }}</p>
                                     <p class="text-sm text-gray-600">Stock: {{ $product->stock }}</p>
                                 </div>
                                 <div class="mt-4">

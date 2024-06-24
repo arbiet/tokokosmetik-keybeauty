@@ -75,7 +75,7 @@
                                 </div>
                                 <!-- Price, Rating, Stock -->
                                 <div class="mt-4 space-y-2">
-                                    <p class="text-sm text-gray-600">Price: ${{ $product->price }}</p>
+                                    <p class="text-sm text-gray-600">Price: Rp. {{ number_format($product->price,2) }}</p>
                                     <p class="text-sm text-gray-600">Rating: {{ $product->rating }}/5</p>
                                     <p class="text-sm text-gray-600">Stock: {{ $product->stock }}</p>
                                 </div>
