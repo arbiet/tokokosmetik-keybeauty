@@ -33,9 +33,12 @@ class AuthenticatedSessionController extends Controller
         } else if($request->user()->usertype === 'storemanager') {
             return redirect('storemanager/dashboard');
         } else if($request->user()->usertype === 'customer') {
-            return redirect('customer/dashboard');
-        }else {
-            return redirect()->intended(route('dashboard', absolute: false));
+            if($request->user()->email_verified_at) {
+                return redirect('customer/dashboard');
+            } else {
+                Auth::guard('web')->logout();
+                return redirect('/email/verify-notice');
+            }
         }
     }
 

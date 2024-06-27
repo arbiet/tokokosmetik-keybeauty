@@ -6,19 +6,19 @@
                     {{ __('Users') }}
                 </h2>
                 <div class="text-gray-900">
-                    {{ __("You're logged in as Librarian!") }} 
+                    {{ __("You're logged in as Store Manager!") }} 
                 </div>
             </div>
             <div class="flex">
                 <div class="space-x-1 mr-2">
-                    <button onclick="window.location.href='{{ route('librarian.users.index') }}'" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
+                    <button onclick="window.location.href='{{ route('storemanager.users.index') }}'" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
                         <i class="fas fa-list"></i>
                     </button>
-                    <button onclick="window.location.href='{{ route('librarian.users.create') }}'" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                    <button onclick="window.location.href='{{ route('storemanager.users.create') }}'" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
-                <form action="{{ route('librarian.users.index') }}" method="GET" class="mb-4">
+                <form action="{{ route('storemanager.users.index') }}" method="GET" class="mb-4">
                     <input type="text" name="search" placeholder="Search users..." value="{{ request()->input('search') }}" class="border border-gray-300 px-3 py-1 rounded-md focus:outline-none focus:border-indigo-500">
                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                         <i class="fas fa-search"></i>
@@ -71,25 +71,25 @@
                                     <td class="p-2">{{ $user->usertype }}</td>
                                     <td class="p-2">{{ $user->email_verified_at ? 'Yes' : 'No' }}</td>
                                     <td class="p-2 space-x-2 flex justify-start">
-                                        <a href="{{ route('librarian.users.detail', ['user' => $user]) }}" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
+                                        <a href="{{ route('storemanager.users.detail', ['user' => $user]) }}" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @if(!$user->email_verified_at)
-                                        <form action="{{ route('librarian.users.verify', ['user' => $user]) }}" method="post" id="verify-form-{{ $user->id }}">
+                                        <form action="{{ route('storemanager.users.verify', ['user' => $user]) }}" method="post" id="verify-form-{{ $user->id }}">
                                             @csrf
                                             <button type="button" onclick="confirmVerify({{ $user->id }})" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                                                 <i class="fas fa-check-circle"></i>
                                             </button>
                                         </form>
                                         @endif
-                                        <form id="delete-form-{{ $user->id }}" action="{{ route('librarian.users.destroy', ['user' => $user]) }}" method="post">
+                                        <form id="delete-form-{{ $user->id }}" action="{{ route('storemanager.users.destroy', ['user' => $user]) }}" method="post">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" onclick="confirmDelete({{ $user->id }})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
-                                        <a href="{{ route('librarian.users.edit', ['user' => $user]) }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                        <a href="{{ route('storemanager.users.edit', ['user' => $user]) }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </td>

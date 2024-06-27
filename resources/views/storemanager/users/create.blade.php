@@ -6,7 +6,7 @@
                     {{ __('Add User') }}
                 </h2>
                 <div class="text-gray-900">
-                    {{ __("You're logged in as Librarian!") }} 
+                    {{ __("You're logged in as Store Manager!") }} 
                 </div>
             </div>
         </div>
@@ -16,7 +16,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form method="POST" action="{{ route('librarian.users.store') }}">
+                    <form method="POST" action="{{ route('storemanager.users.store') }}">
                         @csrf
 
                         <!-- Name -->
@@ -66,8 +66,8 @@
                                 class="mt-1 form-select block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('usertype') border-red-500 @enderror">
                                 <option value="">Select User Type</option>
                                 <option value="admin" {{ old('usertype') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="librarian" {{ old('usertype') == 'librarian' ? 'selected' : '' }}>Librarian</option>
-                                <option value="student" {{ old('usertype') == 'student' ? 'selected' : '' }}>Student</option>
+                                <option value="storemanager" {{ old('usertype') == 'storemanager' ? 'selected' : '' }}>Store Manager</option>
+                                <option value="customer" {{ old('usertype') == 'customer' ? 'selected' : '' }}>Customer</option>
                             </select>
                             @error('usertype')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>

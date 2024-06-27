@@ -17,7 +17,7 @@ class StoreManager
     public function handle(Request $request, Closure $next): Response
     {
         if(Auth::user()->usertype != 'storemanager'){
-            return redirect('dashboard');
+            return redirect('login');
         }
         return $next($request);
     }

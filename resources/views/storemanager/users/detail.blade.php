@@ -6,7 +6,7 @@
                     {{ __('User Detail') }}
                 </h2>
                 <div class="text-gray-900">
-                    {{ __("You're logged in as Librarian!") }} 
+                    {{ __("You're logged in as Store Manager!") }} 
                 </div>
             </div>
             <div>
@@ -41,17 +41,17 @@
                                 <div class="mt-4">
                                     <h3 class="text-sm font-medium text-gray-900">Actions</h3>
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('librarian.users.edit', ['user' => $user]) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                        <a href="{{ route('storemanager.users.edit', ['user' => $user]) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                                             Edit
                                         </a>
-                                        <form id="delete-form-{{ $user->id }}" action="{{ route('librarian.users.destroy', ['user' => $user]) }}" method="post">
+                                        <form id="delete-form-{{ $user->id }}" action="{{ route('storemanager.users.destroy', ['user' => $user]) }}" method="post">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" onclick="confirmDelete({{ $user->id }})" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                                                 Delete
                                             </button>
                                         </form>
-                                        <form id="verify-form-{{ $user->id }}" action="{{ route('librarian.users.verify', ['user' => $user]) }}" method="post">
+                                        <form id="verify-form-{{ $user->id }}" action="{{ route('storemanager.users.verify', ['user' => $user]) }}" method="post">
                                             @csrf
                                             <button type="button" onclick="confirmVerify({{ $user->id }})" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                                                 Verify

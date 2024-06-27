@@ -6,6 +6,9 @@ use App\Http\Controllers\WelcomeController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/product/{product:slug}', [WelcomeController::class, 'show'])->name('welcome.product.show');
+Route::get('/email/verify-notice', function () {
+    return view('auth.verify-notice');
+})->name('verification.notice');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -31,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         } elseif ($user->isCustomer()) {
             return redirect()->route('customer.dashboard.index');
         } else {
-            return view('dashboard');
+            return view('login');
         }
     })->name('dashboard');
 

@@ -4,7 +4,7 @@
             {{ __('Carts') }}
         </h2>
         <div class="text-gray-900">
-            {{ __("You're logged in as Student!") }} 
+            {{ __("You're logged in as Customer!") }} 
         </div>
     </x-slot>
 
@@ -29,7 +29,7 @@
                                         <td class="p-2">{{ $cartItem->book->title }}</td>
                                         <td class="p-2">{{ $cartItem->quantity }}</td>
                                         <td class="p-2">
-                                            <form action="{{ route('student.carts.destroy', ['cart' => $cartItem]) }}" method="POST">
+                                            <form action="{{ route('customer.carts.destroy', ['cart' => $cartItem]) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-500 hover:text-red-700">

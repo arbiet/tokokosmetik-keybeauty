@@ -20,6 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_type',
+        'email_verified_at',
     ];
 
     /**
@@ -67,5 +69,15 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->usertype === 'customer';
+    }
+
+    public static function searchUsers($search)
+    {
+        return self::when($search, function ($query, $search) {
+                return $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            })
+            ->paginate(8)
+            ->appends(['search' => $search]);
     }
 }
