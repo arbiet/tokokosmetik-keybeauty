@@ -4,6 +4,7 @@ use App\Http\Controllers\StoreManagerController;
 use App\Http\Controllers\StoreManagerProductController;
 use App\Http\Controllers\StoreManagerCategoryController;
 use App\Http\Controllers\StoreManagerPromoController;
+use App\Http\Controllers\StoreManagerUserController;
 use App\Http\Controllers\StoreManagerOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,4 +43,14 @@ Route::middleware(['auth', 'verified', 'storemanager'])->prefix('storemanager')-
     Route::get('/promos/{promo}/edit', [StoreManagerPromoController::class, 'edit'])->name('storemanager.promos.edit');
     Route::put('/promos/{promo}', [StoreManagerPromoController::class, 'update'])->name('storemanager.promos.update');
     Route::delete('/promos/{promo}', [StoreManagerPromoController::class, 'destroy'])->name('storemanager.promos.destroy');
+
+    Route::get('/users', [StoreManagerUserController::class, 'index'])->name('storemanager.users.index');
+    Route::get('/users/create', [StoreManagerUserController::class, 'createUser'])->name('storemanager.users.create');
+    Route::post('/users', [StoreManagerUserController::class, 'storeUser'])->name('storemanager.users.store');
+    Route::get('/users/{user}', [StoreManagerUserController::class, 'detailUser'])->name('storemanager.users.detail');
+    Route::get('/users/{user}/edit', [StoreManagerUserController::class, 'editUser'])->name('storemanager.users.edit');
+    Route::put('/users/{user}', [StoreManagerUserController::class, 'updateUser'])->name('storemanager.users.update');
+    Route::delete('/users/{user}', [StoreManagerUserController::class, 'destroyUser'])->name('storemanager.users.destroy');
+    Route::post('/users/{user}/verify', [StoreManagerUserController::class, 'verifyUser'])->name('storemanager.users.verify');
+
 });

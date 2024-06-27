@@ -48,11 +48,6 @@
                                 {{ __('Orders') }}
                             </x-nav-link>
                         </div>
-                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <x-nav-link :href="route('customer.history.index')" :active="request()->routeIs('customer.history*')">
-                                {{ __('History') }}
-                            </x-nav-link>
-                        </div>
                     @elseif (Auth::user()->isStoreManager())
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link :href="route('storemanager.products.index')" :active="request()->routeIs('storemanager.products*')">
@@ -72,6 +67,11 @@
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link :href="route('storemanager.promos.index')" :active="request()->routeIs('storemanager.promos*')">
                                 {{ __('Promos') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('storemanager.users.index')" :active="request()->routeIs('storemanager.users*')">
+                                {{ __('Users') }}
                             </x-nav-link>
                         </div>
                     @endif
@@ -183,6 +183,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('storemanager.promos.index')" :active="request()->routeIs('storemanager.promos*')">
                         {{ __('Promos') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('storemanager.users.index')" :active="request()->routeIs('storemanager.users*')">
+                        {{ __('Users') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
