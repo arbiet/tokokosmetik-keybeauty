@@ -18,11 +18,33 @@
                             <p class="text-lg">Total Orders</p>
                             <p class="text-2xl font-bold">{{ $totalOrders }}</p>
                         </div>
-                        <div class="bg-green-100 p-4 rounded-lg">
-                            <p class="text-lg">Total Spent</p>
-                            <p class="text-2xl font-bold">Rp. {{ number_format($totalSpent, 2) }}</p>
+                        <div class="bg-yellow-100 p-4 rounded-lg">
+                            <p class="text-lg">Total Spend on Completed Orders</p>
+                            <p class="text-2xl font-bold">Rp. {{ number_format($totalCompletedSpend, 2) }}</p>
                         </div>
                     </div>
+
+                    <h3 class="text-2xl font-semibold mb-4">All Orders</h3>
+                    <table class="min-w-full divide-y divide-gray-200 mb-6">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($allOrders as $order)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $order->created_at->format('d-m-Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">Rp. {{ number_format($order->total, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($order->status) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
 
                     <h3 class="text-2xl font-semibold mb-4">Recent Orders</h3>
                     <table class="min-w-full divide-y divide-gray-200 mb-6">

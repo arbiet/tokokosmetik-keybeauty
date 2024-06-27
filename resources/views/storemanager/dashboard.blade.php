@@ -9,20 +9,31 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-2xl font-semibold mb-4">Sales Overview</h3>
+                    <h3 class="text-2xl font-semibold mb-4">Sales Overview (Completed Orders)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div class="bg-blue-100 p-4 rounded-lg">
                             <p class="text-lg">Total Sales</p>
                             <p class="text-2xl font-bold">Rp. {{ number_format($totalSales, 2) }}</p>
                         </div>
                         <div class="bg-green-100 p-4 rounded-lg">
-                            <p class="text-lg">Total Orders</p>
-                            <p class="text-2xl font-bold">{{ $totalOrders }}</p>
+                            <p class="text-lg">Total Completed Orders</p>
+                            <p class="text-2xl font-bold">{{ $totalCompletedOrders }}</p>
                         </div>
                         <div class="bg-yellow-100 p-4 rounded-lg">
                             <p class="text-lg">Average Order Value</p>
                             <p class="text-2xl font-bold">Rp. {{ number_format($averageOrderValue, 2) }}</p>
                         </div>
+                    </div>
+
+                    <h3 class="text-2xl font-semibold mb-4">Sales Overview by Status</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        @foreach($salesByStatus as $status)
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <p class="text-lg capitalize">{{ $status->status }}</p>
+                                <p class="text-xl font-bold">Orders: {{ $status->count }}</p>
+                                <p class="text-xl font-bold">Total: Rp. {{ number_format($status->total, 2) }}</p>
+                            </div>
+                        @endforeach
                     </div>
 
                     <h3 class="text-2xl font-semibold mb-4">Top Products</h3>

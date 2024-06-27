@@ -38,7 +38,7 @@
                                 <p>
                                     {{ ucfirst($order->status) }} 
                                     @if($order->payment_proof)
-                                        <button onclick="viewPaymentProof('{{ asset('storage/' . $order->payment_proof) }}')" class="text-green-500 hover:text-green-600">
+                                        <button onclick="viewPaymentProof({{ $order->id }}, '{{ Storage::url('public/payment_proofs/' . $order->payment_proof) }}')" class="text-green-500 hover:text-green-600">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     @endif
@@ -233,15 +233,36 @@
         </div>
     </div>
     <script>
-        function viewPaymentProof(url) {
-            Swal.fire({
-                title: 'Payment Proof',
-                imageUrl: url,
-                imageAlt: 'Payment Proof',
-                showCloseButton: true,
-                focusConfirm: false,
-            });
-        }
+function viewPaymentProof(orderId, paymentProofUrl) {
+            let fileType = paymentProofUrl.split('.').pop();
+
+            if (fileType === 'pdf') {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    html: `<embed src="${paymentProofUrl}" width="100%" height="400px" />`,
+                    showCancelButton: false,
+                    confirmButtonText: 'Close',
+                });
+            } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    imageUrl: paymentProofUrl,
+                    imageAlt: 'Payment Proof',
+                    showCancelButton: false,
+                    confirmButtonText: 'Close',
+                });
+            } else {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    text: 'Unsupported file format. Click below to download.',
+                    showCancelButton: false,
+                    confirmButtonText: 'Download File',
+                    preConfirm: () => {
+                        window.location.href = paymentProofUrl;
+                    }
+                });
+            }
+        }   
         function confirmComplete(orderId) {
             Swal.fire({
                 title: 'Are you sure?',

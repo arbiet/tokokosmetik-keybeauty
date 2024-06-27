@@ -25,6 +25,8 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Order Details Section -->
                     <div class="mt-6">
                         <div class="flex justify-between">
                             <div>
@@ -36,7 +38,7 @@
                                 <p>
                                     {{ ucfirst($order->status) }}
                                     @if($order->payment_proof)
-                                        <button onclick="viewPaymentProof('{{ asset('storage/' . $order->payment_proof) }}')" class="text-green-500 hover:text-green-600">
+                                        <button onclick="viewPaymentProof({{ $order->id }}, '{{ Storage::url('public/payment_proofs/' . $order->payment_proof) }}')" class="text-green-500 hover:text-green-600">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     @endif
@@ -48,6 +50,7 @@
                             </div>
                         </div>
 
+                        <!-- Shipping Details Section -->
                         <div class="mt-6">
                             <h4 class="font-semibold text-lg text-gray-900">
                                 <i class="fas fa-shipping-fast"></i> Shipping Details
@@ -72,6 +75,26 @@
                             </div>
                         </div>
 
+                        <!-- Tracking Information Section -->
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-lg text-gray-900">
+                                <i class="fas fa-truck"></i> Tracking Information
+                            </h4>
+                            <div class="mt-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="font-semibold">Shipping Service:</p>
+                                        <p>{{ $order->shipping_service }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Tracking Number:</p>
+                                        <p>{{ $order->tracking_number }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Items Section -->
                         <div class="mt-6">
                             <h4 class="font-semibold text-lg text-gray-900">
                                 <i class="fas fa-box"></i> Order Items
@@ -97,20 +120,158 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Order Status Progress Section -->
+                        <div class="mt-6 text-center">
+                            <p class='text-2xl font-bold @if($order->status === 'unpaid') text-red-500 @elseif($order->status === 'paid') text-green-500 @elseif($order->status === 'packaging') text-yellow-500 @elseif($order->status === 'shipped') text-blue-500 @elseif($order->status === 'completed') text-green-700 @elseif($order->status === 'canceled') text-gray-500 @endif'>
+                                {{ strtoupper($order->status) }}
+                            </p>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="flex justify-center items-center space-x-4">
+                                <div class="text-center">
+                                    <i class='fas fa-shopping-cart text-2xl @if($order->status !== 'unpaid') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Checkout</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class='fas fa-money-bill-wave text-2xl @if($order->status !== 'unpaid' && $order->status !== 'canceled') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Unpaid</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class='fas fa-check-circle text-2xl @if($order->status === 'paid' || $order->status === 'packaging' || $order->status === 'shipped' || $order->status === 'completed') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Paid</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class='fas fa-box text-2xl @if($order->status === 'packaging' || $order->status === 'shipped' || $order->status === 'completed') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Packaging</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class='fas fa-truck text-2xl @if($order->status === 'shipped' || $order->status === 'completed') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Shipped</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class='fas fa-check text-2xl @if($order->status === 'completed') text-green-500 @else text-gray-500 @endif'></i>
+                                    <p>Completed</p>
+                                </div>
+                                @if($order->status === 'canceled')
+                                <div class="text-center">
+                                    <i class='fas fa-times-circle text-2xl @if($order->status === 'canceled') text-red-500 @else text-gray-500 @endif'></i>
+                                    <p>Canceled</p>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        function viewPaymentProof(url) {
+        function viewPaymentProof(orderId, paymentProofUrl) {
+            let fileType = paymentProofUrl.split('.').pop();
+
+            if (fileType === 'pdf') {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    html: `<embed src="${paymentProofUrl}" width="100%" height="400px" />`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Accept Payment',
+                    cancelButtonText: 'Cancel Order',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ status: 'packaging' })
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText)
+                            }
+                            return response.json()
+                        }).catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`)
+                        })
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }
+                });
+            } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    imageUrl: paymentProofUrl,
+                    imageAlt: 'Payment Proof',
+                    showCancelButton: true,
+                    confirmButtonText: 'Accept Payment',
+                    cancelButtonText: 'Cancel Order',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ status: 'packaging' })
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText)
+                            }
+                            return response.json()
+                        }).catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`)
+                        })
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    text: 'Unsupported file format. Click below to download.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Download File',
+                    cancelButtonText: 'Cancel',
+                    preConfirm: () => {
+                        window.location.href = paymentProofUrl;
+                    }
+                });
+            }
+        }
+        function confirmComplete(orderId) {
             Swal.fire({
-                title: 'Payment Proof',
-                imageUrl: url,
-                imageAlt: 'Payment Proof',
-                showCloseButton: true,
-                focusConfirm: false,
+                title: 'Are you sure?',
+                text: "Do you want to mark this order as completed?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, complete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form to complete the order
+                    document.getElementById('complete-order-form-' + orderId).submit();
+                }
             });
         }
     </script>
+
+    @if ($order->status === 'shipped')
+        <form id="complete-order-form-{{ $order->id }}" method="POST" action="{{ route('storemanager.orders.complete', $order->id) }}" style="display: none;">
+            @csrf
+        </form>
+    @endif
 </x-app-layout>
