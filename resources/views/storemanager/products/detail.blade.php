@@ -49,7 +49,7 @@
                     <div class="flex flex-col md:flex-row mt-2">
                         <div class="w-full md:w-1/2"> <!-- Set width to half on desktop -->
                             <div class="aspect-h-4 aspect-w-3 overflow-hidden rounded-lg">
-                                <img src="{{ $product->image ? asset('storage/images/products/' . $product->image) : asset('storage/images/products/default.png') }}" alt="Product Image" class="w-full h-full object-cover object-center">
+                                <img src="{{ $product->image ? Storage::url('images/products/' . $product->image) : Storage::url('images/products/default.png') }}" alt="Product Image" class="w-full h-full object-cover object-center">
                             </div>
                         </div>
                         <div class="w-full md:w-1/2 md:pl-4 mt-4 md:mt-0"> <!-- Set width to half on desktop -->

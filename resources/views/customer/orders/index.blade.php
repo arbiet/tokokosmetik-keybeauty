@@ -21,6 +21,8 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Date</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tracking Number</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shipping Service</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -31,6 +33,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $order->order_date }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($order->status) }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->tracking_number ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->shipping_service ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">Rp. {{ number_format($order->final_total, 2) }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <a href="{{ route('customer.orders.show', $order->id) }}" class="text-blue-500 hover:text-blue-700">View</a>

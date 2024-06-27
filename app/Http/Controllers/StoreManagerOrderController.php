@@ -59,7 +59,6 @@ class StoreManagerOrderController extends Controller
                 'message' => 'Tracking number added and order status updated to shipped.'
             ]);
         } catch (\Exception $e) {
-            // Log the error for debugging
             \Log::error('Failed to add tracking number: ' . $e->getMessage());
     
             return response()->json([
@@ -93,5 +92,4 @@ class StoreManagerOrderController extends Controller
         $pdf = Pdf::loadView('storemanager.orders.invoice', compact('order'));
         return $pdf->download('invoice-order-'.$order->id.'.pdf');
     }
-
 }

@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
 
 class WelcomeController extends Controller
 {
     public function index(Request $request)
     {
         $query = $request->input('query');
-        $products = Product::where('title', 'like', '%'.$query.'%')
-                            ->orderBy('created_at', 'desc') // Mengurutkan produk berdasarkan waktu pembuatan
-                            ->paginate(8); // Menambahkan pagination dengan 8 produk per halaman
+        $products = Product::where('name', 'like', '%' . $query . '%')
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(8);
+
         return view('welcome', compact('products', 'query'));
     }
     

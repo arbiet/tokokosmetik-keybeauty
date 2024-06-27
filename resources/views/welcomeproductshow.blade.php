@@ -20,8 +20,8 @@
     <!-- Page Content -->
     <main class="flex justify-center items-center h-full">
         <form action="{{ route('welcome') }}" method="GET" class="w-full md:w-1/2 lg:w-1/3 px-4">
-            <div class="flex items-center  py-2">
-                <input type="text" name="query" value="" placeholder="Search Products..." class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300">
+            <div class="flex items-center py-2">
+                <input type="text" name="query" value="{{ request('query') }}" placeholder="Search Products..." class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300">
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">
                     <i class="fas fa-search"></i>
                 </button>
@@ -36,7 +36,6 @@
                     <!-- Breadcrumb -->
                     <nav aria-label="Breadcrumb" class="flex justify-between items-center">
                         <ol role="list" class="flex items-center space-x-2">
-                            <!-- You can change these links according to your application -->
                             <li>
                                 <div class="flex items-center">
                                     <a href="#" class="mr-2 text-sm font-medium text-gray-900">{{ $product->category->name }}</a>
@@ -62,7 +61,7 @@
                     <div class="flex flex-col md:flex-row mt-2">
                         <div class="w-full md:w-1/3">
                             <div class="aspect-h-4 aspect-w-3 overflow-hidden rounded-lg">
-                                <img src="{{ $product->image ? asset('storage/images/products/' . $product->image) : asset('storage/images/products/product.jpeg') }}" alt="product Cover" class="w-full h-full object-cover object-center">
+                                <img src="{{ $product->image ? Storage::url('images/products/' . $product->image) : Storage::url('images/products/default.png') }}" alt="product Cover" class="w-full h-full object-cover object-center">
                             </div>
                         </div>
                         <div class="w-full md:w-2/3 md:pl-4 mt-4 md:mt-0">
@@ -83,10 +82,7 @@
                             @auth
                                 @if(Auth::user()->isCustomer())
                                     <div class="mt-4 flex justify-between items-center">
-                                        <form action="{{ route('customer.carts.add', ['product' => $product->id]) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add to Cart</button>
-                                        </form>
+                                        <button onclick="showAddToCartModal({{ $product->id }}, '{{ $product->name }}', {{ $product->stock }})" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add to Cart</button>
                                     </div>
                                 @endif
                             @endauth
@@ -97,5 +93,56 @@
         </div>
     </div>
 </div>
+
+<script>
+    function showAddToCartModal(productId, productName, productStock) {
+        Swal.fire({
+            title: `Add ${productName} to Cart`,
+            input: 'number',
+            inputLabel: 'Quantity',
+            inputAttributes: {
+                min: 1,
+                max: productStock,
+                step: 1
+            },
+            inputValue: 1,
+            showCancelButton: true,
+            confirmButtonText: 'Add to Cart',
+            showLoaderOnConfirm: true,
+            preConfirm: (quantity) => {
+                if (quantity < 1 || quantity > productStock) {
+                    Swal.showValidationMessage(`Please enter a valid quantity (1-${productStock})`);
+                } else {
+                    return fetch(`/customer/cart/add/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ quantity: quantity })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: `${productName} has been added to your cart.`,
+                    icon: 'success'
+                });
+            }
+        });
+    }
+</script>
 </body>
 </html>

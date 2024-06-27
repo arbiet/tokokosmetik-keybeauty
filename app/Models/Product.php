@@ -10,7 +10,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price', 'stock', 'image', 'category_id','slug'];
+    protected $fillable = ['name', 'description', 'price', 'stock', 'image', 'category_id', 'slug', 'weight', 'length', 'width', 'height', 'status'];
 
     // Relasi Many-to-One dengan Category
     public function category()

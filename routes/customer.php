@@ -26,6 +26,6 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->group(f
     Route::get('/orders', [CustomerOrderController::class, 'index'])->name('customer.orders.index');
     Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
     Route::post('/orders/{order}/upload-payment-proof', [CustomerOrderController::class, 'uploadPaymentProof'])->name('customer.orders.uploadPaymentProof');
-    Route::get('customer/orders/{order}/invoice', [CustomerOrderController::class, 'generateInvoice'])->name('customer.orders.invoice');
-    Route::post('/customer/orders/{order}/complete', [CustomerOrderController::class, 'complete'])->name('customer.orders.complete');
+    Route::get('/orders/{order}/invoice', [CustomerOrderController::class, 'generateInvoice'])->name('customer.orders.invoice');
+    Route::post('/orders/{order}/complete', [CustomerOrderController::class, 'complete'])->name('customer.orders.complete');
 });

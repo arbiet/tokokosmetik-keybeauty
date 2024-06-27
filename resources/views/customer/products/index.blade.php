@@ -28,7 +28,7 @@
                         @foreach($products as $product)
                             <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
                                 <a href="{{ route('welcome.product.show', ['product' => $product]) }}">
-                                    <img class="w-full h-64 object-cover object-center" src="{{ $product->image ? asset('storage/images/products/' . $product->image) : asset('storage/images/products/default.jpg') }}" alt="Product Image">
+                                    <img class="w-full h-64 object-cover object-center" src="{{ $product->image ? Storage::url('images/products/' . $product->image) : Storage::url('images/products/default.png') }}" alt="Product Image">
                                 </a>
                                 <div class="p-4">
                                     <h3 class="font-semibold text-lg mb-2">{{ $product->name }}</h3>

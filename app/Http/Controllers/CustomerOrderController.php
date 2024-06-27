@@ -10,6 +10,7 @@ use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerOrderController extends Controller
 {
@@ -92,7 +93,13 @@ class CustomerOrderController extends Controller
     public function show($id)
     {
         $order = Order::with('items.product')->findOrFail($id);
-        return view('customer.orders.show', compact('order'));
+        $paymentMethods = [
+            'Dana/ShopeePay: +62 857-3022-1383',
+            'Bank BRI: 6423 0101 6152 534 ',
+            'Atas Nama: Aprilia Salsa Bella'
+        ];
+
+        return view('customer.orders.show', compact('order', 'paymentMethods'));
     }
 
     public function uploadPaymentProof(Request $request, $id)
@@ -100,22 +107,28 @@ class CustomerOrderController extends Controller
         $request->validate([
             'payment_proof' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
-
+    
         $order = Order::findOrFail($id);
-
+    
         if ($request->hasFile('payment_proof')) {
-            $file = $request->file('payment_proof');
-            $filePath = $file->store('payment_proofs', 'public');
-
+            // Delete the old payment proof if exists
+            if ($order->payment_proof) {
+                Storage::delete('public/payment_proofs/' . $order->payment_proof);
+            }
+    
+            // Store the new payment proof
+            $fileName = $request->file('payment_proof')->hashName();
+            $request->file('payment_proof')->storeAs('public/payment_proofs', $fileName);
+    
             $order->update([
-                'payment_proof' => $filePath,
+                'payment_proof' => $fileName,
                 'status' => 'paid',
                 'payment_date' => now(),
             ]);
-
+    
             return redirect()->route('customer.orders.show', $order->id)->with('success', 'Payment proof uploaded successfully.');
         }
-
+    
         return redirect()->back()->withErrors('Failed to upload payment proof.');
     }
 
@@ -125,6 +138,7 @@ class CustomerOrderController extends Controller
         $pdf = Pdf::loadView('customer.orders.invoice', compact('order'));
         return $pdf->download('invoice-order-' . $order->id . '.pdf');
     }
+
     public function complete($id)
     {
         $order = Order::findOrFail($id);

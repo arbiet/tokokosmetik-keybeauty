@@ -39,7 +39,7 @@
                                         <td class="p-2">{{ $order->shipping_service ?? 'N/A' }}</td>
                                         <td class="p-2 space-x-2 flex">
                                             @if($order->status == 'paid')
-                                                <button onclick="checkPaymentProof({{ $order->id }}, '{{ asset('storage/' . $order->payment_proof) }}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                                <button onclick="checkPaymentProof({{ $order->id }}, '{{ Storage::url('public/payment_proofs/' . $order->payment_proof) }}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                                                     <i class="fas fa-file-invoice-dollar"></i>
                                                 </button>
                                                 <button onclick="changeStatus({{ $order->id }}, 'cancelled')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
@@ -81,39 +81,87 @@
 
     <script>
         function checkPaymentProof(orderId, paymentProofUrl) {
-            Swal.fire({
-                title: 'Payment Proof',
-                imageUrl: paymentProofUrl,
-                imageAlt: 'Payment Proof',
-                showCancelButton: true,
-                confirmButtonText: 'Accept Payment',
-                cancelButtonText: 'Cancel Order',
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                    return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ status: 'packaging' })
-                    }).then(response => {
-                        if (!response.ok) {
-                            throw new Error(response.statusText)
-                        }
-                        return response.json()
-                    }).catch(error => {
-                        Swal.showValidationMessage(`Request failed: ${error}`)
-                    })
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
-                        location.reload();
-                    });
-                }
-            });
+            let fileType = paymentProofUrl.split('.').pop();
+
+            if (fileType === 'pdf') {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    html: `<embed src="${paymentProofUrl}" width="100%" height="400px" />`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Accept Payment',
+                    cancelButtonText: 'Cancel Order',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ status: 'packaging' })
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText)
+                            }
+                            return response.json()
+                        }).catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`)
+                        })
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }
+                });
+            } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    imageUrl: paymentProofUrl,
+                    imageAlt: 'Payment Proof',
+                    showCancelButton: true,
+                    confirmButtonText: 'Accept Payment',
+                    cancelButtonText: 'Cancel Order',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ status: 'packaging' })
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText)
+                            }
+                            return response.json()
+                        }).catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`)
+                        })
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Success', 'Payment accepted and order status updated.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Payment Proof',
+                    text: 'Unsupported file format. Click below to download.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Download File',
+                    cancelButtonText: 'Cancel',
+                    preConfirm: () => {
+                        window.location.href = paymentProofUrl;
+                    }
+                });
+            }
         }
 
         function changeStatus(orderId, status) {
@@ -225,24 +273,25 @@
                 }
             });
         }
-        function trackPackage(trackingNumber, shippingService) {
-        let url = '';
-        
-        switch (shippingService) {
-            case 'jne':
-                url = `https://jne.co.id/tracking-package?cek-resi=${trackingNumber}`;
-                break;
-            case 'pos':
-                url = `https://www.posindonesia.co.id/id/tracking?receiptId=${trackingNumber}`;
-                break;
-            case 'tiki':
-                url = `https://tiki.id/id/track?tracking=${trackingNumber}`;
-                break;
-            default:
-                return;
-        }
 
-        window.open(url, '_blank');
-    }
+        function trackPackage(trackingNumber, shippingService) {
+            let url = '';
+            
+            switch (shippingService) {
+                case 'jne':
+                    url = `https://jne.co.id/tracking-package?cek-resi=${trackingNumber}`;
+                    break;
+                case 'pos':
+                    url = `https://www.posindonesia.co.id/id/tracking?receiptId=${trackingNumber}`;
+                    break;
+                case 'tiki':
+                    url = `https://tiki.id/id/track?tracking=${trackingNumber}`;
+                    break;
+                default:
+                    return;
+            }
+
+            window.open(url, '_blank');
+        }
     </script>
 </x-app-layout>

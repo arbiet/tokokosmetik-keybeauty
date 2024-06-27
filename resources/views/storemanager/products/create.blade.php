@@ -67,6 +67,55 @@
                             </select>
                         </div>
 
+                        <!-- Weight -->
+                        <div class="mt-4">
+                            <label for="weight" class="block text-sm font-medium leading-5 text-gray-700">Weight (gram)</label>
+                            <input id="weight" type="number" step="0.01" name="weight" value="{{ old('weight') }}" required
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('weight') border-red-500 @enderror">
+                            @error('weight')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Length -->
+                        <div class="mt-4">
+                            <label for="length" class="block text-sm font-medium leading-5 text-gray-700">Length (mm)</label>
+                            <input id="length" type="number" step="0.01" name="length" value="{{ old('length') }}" 
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('length') border-red-500 @enderror">
+                            @error('length')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Width -->
+                        <div class="mt-4">
+                            <label for="width" class="block text-sm font-medium leading-5 text-gray-700">Width (mm)</label>
+                            <input id="width" type="number" step="0.01" name="width" value="{{ old('width') }}" 
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('width') border-red-500 @enderror">
+                            @error('width')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Height -->
+                        <div class="mt-4">
+                            <label for="height" class="block text-sm font-medium leading-5 text-gray-700">Height (mm)</label>
+                            <input id="height" type="number" step="0.01" name="height" value="{{ old('height') }}" 
+                                class="mt-1 form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md @error('height') border-red-500 @enderror">
+                            @error('height')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mt-4">
+                            <label for="status" class="block text-sm font-medium leading-5 text-gray-700">Status</label>
+                            <select id="status" name="status" class="form-select block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded-md">
+                                <option value="available" {{ old('status') == 'available' ? 'selected' : '' }}>Available</option>
+                                <option value="unavailable" {{ old('status') == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
+                            </select>
+                        </div>
+
                         <!-- Image -->
                         <div class="mt-4">
                             <label for="image" class="block text-sm font-medium leading-5 text-gray-700">Image</label>
