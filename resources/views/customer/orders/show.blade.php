@@ -141,7 +141,7 @@
                             </div>
                         @endif
 
-                        @if ($order->status === 'unpaid' || $order->status === 'canceled')
+                        @if ($order->status === 'unpaid' || $order->status === 'cancelled')
                             <div class="mt-6">
                                 <h4 class="font-semibold text-lg text-gray-900">
                                     <i class="fas fa-upload"></i> Upload Payment Proof

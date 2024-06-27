@@ -36,12 +36,51 @@ class StoreManagerOrderController extends Controller
 
     public function cancelOrder(Order $order)
     {
-        $order->status = 'cancelled';
-        $order->save();
-        Alert::success('Order Cancelled', 'The order has been cancelled.');
-
+        try {
+            // Delete the payment proof file if it exists
+            if ($order->payment_proof && Storage::exists('public/payment_proofs/' . $order->payment_proof)) {
+                Storage::delete('public/payment_proofs/' . $order->payment_proof);
+            }
+    
+            // Update order status to cancelled
+            $order->status = 'cancelled';
+            $order->payment_proof = null;
+            $order->save();
+    
+            Alert::success('Order Cancelled', 'The order has been cancelled and payment proof deleted.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to cancel order: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel order.'
+            ], 500);
+        }
+    
         return redirect()->route('storemanager.orders.show', $order);
     }
+    
+    public function changeStatus(Request $request, Order $order)
+    {
+        try {
+            $status = $request->input('status');
+            \Log::info('Attempting to change order status', ['order_id' => $order->id, 'status' => $status]);
+    
+            $order->status = $status;
+            $order->save();
+    
+            \Log::info('Order status changed successfully', ['order_id' => $order->id, 'status' => $status]);
+    
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            \Log::error('Failed to change order status: ' . $e->getMessage(), ['order_id' => $order->id, 'status' => $status]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to change order status.'
+            ], 500);
+        }
+    }
+    
+    
 
     public function addTrackingNumber(Request $request, Order $order)
     {
@@ -75,15 +114,6 @@ class StoreManagerOrderController extends Controller
         Alert::success('Order Completed', 'The order has been marked as completed.');
 
         return redirect()->route('storemanager.orders.show', $order);
-    }
-
-    public function changeStatus(Request $request, Order $order)
-    {
-        $status = $request->input('status');
-        $order->status = $status;
-        $order->save();
-
-        return response()->json(['status' => 'success']);
     }
 
     public function generateInvoice($id)

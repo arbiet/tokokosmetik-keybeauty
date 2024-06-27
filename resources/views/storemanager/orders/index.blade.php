@@ -78,11 +78,10 @@
             </div>
         </div>
     </div>
-
     <script>
         function checkPaymentProof(orderId, paymentProofUrl) {
             let fileType = paymentProofUrl.split('.').pop();
-
+    
             if (fileType === 'pdf') {
                 Swal.fire({
                     title: 'Payment Proof',
@@ -163,41 +162,42 @@
                 });
             }
         }
-
+    
         function changeStatus(orderId, status) {
-            Swal.fire({
-                title: status === 'cancelled' ? 'Cancel Order' : 'Accept Order',
-                text: `Are you sure you want to ${status === 'cancelled' ? 'cancel' : 'accept'} this order?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `Yes, ${status === 'cancelled' ? 'cancel' : 'accept'} it!`
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/storemanager/orders/${orderId}/changeStatus`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ status })
-                    }).then(response => {
-                        if (!response.ok) {
-                            throw new Error(response.statusText)
-                        }
-                        return response.json()
-                    }).then(() => {
-                        Swal.fire('Success', `Order has been ${status === 'cancelled' ? 'cancelled' : 'accepted'}.`, 'success').then(() => {
-                            location.reload();
-                        });
-                    }).catch(error => {
-                        Swal.fire('Error', `Failed to ${status === 'cancelled' ? 'cancel' : 'accept'} order.`, 'error');
-                    });
+    Swal.fire({
+        title: status === 'cancelled' ? 'Cancel Order' : 'Accept Order',
+        text: `Are you sure you want to ${status === 'cancelled' ? 'cancel' : 'accept'} this order?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Yes, ${status === 'cancelled' ? 'cancel' : 'accept'} it!`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/storemanager/orders/${orderId}/changeStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ status })
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText)
                 }
+                return response.json()
+            }).then(() => {
+                Swal.fire('Success', `Order has been ${status === 'cancelled' ? 'cancelled' : 'accepted'}.`, 'success').then(() => {
+                    location.reload();
+                });
+            }).catch(error => {
+                Swal.fire('Error', `Failed to ${status === 'cancelled' ? 'cancel' : 'accept'} order.`, 'error');
             });
         }
+    });
+}
 
+    
         function addTrackingNumber(orderId) {
             Swal.fire({
                 title: 'Add Tracking Number',
@@ -239,7 +239,7 @@
                 }
             });
         }
-
+    
         function completeOrder(orderId) {
             Swal.fire({
                 title: 'Complete Order',
@@ -273,7 +273,7 @@
                 }
             });
         }
-
+    
         function trackPackage(trackingNumber, shippingService) {
             let url = '';
             
@@ -290,8 +290,41 @@
                 default:
                     return;
             }
-
+    
             window.open(url, '_blank');
         }
+    
+        function cancelOrder(orderId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to cancel this order and delete the payment proof?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'No, keep it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/storemanager/orders/${orderId}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json()
+                    }).then(() => {
+                        Swal.fire('Cancelled', 'The order has been cancelled and payment proof deleted.', 'success').then(() => {
+                            location.reload();
+                        });
+                    }).catch(error => {
+                        Swal.fire('Error', `Failed to cancel order: ${error.message}`, 'error');
+                    });
+                }
+            });
+        }
     </script>
+    
 </x-app-layout>

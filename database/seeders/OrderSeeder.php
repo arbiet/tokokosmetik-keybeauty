@@ -121,7 +121,7 @@ class OrderSeeder extends Seeder
      */
     private function getRandomStatus()
     {
-        $statuses = ['unpaid', 'packaging', 'shipped', 'completed', 'canceled'];
+        $statuses = ['unpaid', 'packaging', 'shipped', 'completed', 'cancelled'];
         return $statuses[array_rand($statuses)];
     }
 }
